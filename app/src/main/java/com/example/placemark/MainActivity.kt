@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(32, 32, 32, 32)
+            setPadding(32, 320, 32, 32)
         }
 
         val title = TextView(this).apply {
