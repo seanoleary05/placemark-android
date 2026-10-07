@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         viewMarksButton.setOnClickListener {
             startActivity(
-                Intent(this, MainActivity::class.java)
+                Intent(this, MarkListActivity::class.java)
             )
         }
 
