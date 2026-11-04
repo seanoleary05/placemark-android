@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import timber.log.Timber
 import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        Timber.plant(Timber.DebugTree())
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainTitle)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -33,12 +35,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(
                 Intent(this, MarkListActivity::class.java)
             )
+            Timber.d("Viewing Marks")
         }
 
         addMarkButton.setOnClickListener {
             startActivity(
                 Intent(this, AddEditActivity::class.java)
             )
+            Timber.d("Adding Mark")
         }
 
     }

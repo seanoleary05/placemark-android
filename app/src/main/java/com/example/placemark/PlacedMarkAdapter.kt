@@ -1,16 +1,17 @@
 package com.example.placemark
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class PlacedMarkAdapter(
     private var marks: List<PlacedMarkData>,
-    private val onEdit: (PlacedMarkData) -> Unit,
-    private val onDelete: (PlacedMarkData) -> Unit
+    private val listener: OnMarkListener
 ) : RecyclerView.Adapter<PlacedMarkAdapter.MarkViewHolder>() {
 
     class MarkViewHolder(itemView: View) :
@@ -25,11 +26,10 @@ class PlacedMarkAdapter(
         val coordinatesText: TextView =
             itemView.findViewById(R.id.coordinatesText)
 
-        val editButton: Button =
-            itemView.findViewById(R.id.editButton)
+        val markImage: ImageView =
+            itemView.findViewById(R.id.imageView)
 
-        val deleteButton: Button =
-            itemView.findViewById(R.id.deleteButton)
+
     }
 
     override fun onCreateViewHolder(
@@ -52,7 +52,29 @@ class PlacedMarkAdapter(
         position: Int
     ) {
 
+
+
         val mark = marks[position]
+
+        val imageUri = mark.imageUri?.let { Uri.parse(it) }
+
+
+
+
+
+        holder.itemView.setOnClickListener {
+
+            listener.onMarkClick(mark)
+
+        }
+
+
+
+        holder.itemView.setOnLongClickListener {
+
+            listener.onMarkLongClick(mark)
+
+        }
 
         holder.titleText.text =
             "${mark.id}: ${mark.title}"
@@ -63,13 +85,15 @@ class PlacedMarkAdapter(
         holder.coordinatesText.text =
             "X: ${mark.x}, Y: ${mark.y}"
 
-        holder.editButton.setOnClickListener {
-            onEdit(mark)
+        if (imageUri != null) {
+            holder.markImage.setImageURI(imageUri)
+        } else {
+            holder.markImage.setImageResource(
+                android.R.drawable.ic_menu_gallery
+            )
         }
 
-        holder.deleteButton.setOnClickListener {
-            onDelete(mark)
-        }
+
     }
 
     override fun getItemCount(): Int {
@@ -80,4 +104,6 @@ class PlacedMarkAdapter(
         marks = newMarks
         notifyDataSetChanged()
     }
+
+
 }
