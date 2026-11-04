@@ -6,6 +6,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 
 class AddEditActivity : AppCompatActivity() {
 
@@ -14,7 +17,14 @@ class AddEditActivity : AppCompatActivity() {
     private lateinit var xInput: EditText
     private lateinit var yInput: EditText
 
+    private lateinit var imagePreview: ImageView
+    private var selectedImageUri: Uri? = null
+
+
+
     private var editingId: Long? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +49,13 @@ class AddEditActivity : AppCompatActivity() {
         val cancelButton =
             findViewById<Button>(R.id.cancelButton)
 
+        findViewById<Button>(R.id.imageButton).setOnClickListener {
+            imagePicker.launch(arrayOf("image/*"))
+        }
+
+
+        imagePreview = findViewById(R.id.imageAddEdit)
+
         editingId =
             intent.getLongExtra("id", -1L)
                 .takeIf { it != -1L }
@@ -59,6 +76,28 @@ class AddEditActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    val imagePicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            if (uri != null) {
+                // Keep access to the document URI for later use, when supported.
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: SecurityException) {
+                    // Some providers may not grant persistable access.
+                }
+
+                selectedImageUri = uri
+                imagePreview.setImageURI(uri)
+            }
+        }
+
+
+
+
 
     private fun loadExistingMark(id: Long) {
 
@@ -81,6 +120,14 @@ class AddEditActivity : AppCompatActivity() {
         descriptionInput.setText(mark.description)
         xInput.setText(mark.x.toString())
         yInput.setText(mark.y.toString())
+        selectedImageUri = mark.imageUri?.let { Uri.parse(it) }
+
+        if (selectedImageUri != null) {
+            imagePreview.setImageURI(selectedImageUri)
+        } else {
+            imagePreview.setImageResource(android.R.drawable.ic_menu_gallery)
+        }
+
     }
 
     private fun saveMark() {
@@ -118,7 +165,8 @@ class AddEditActivity : AppCompatActivity() {
                 title = title,
                 description = description,
                 x = x,
-                y = y
+                y = y,
+                imageUri = selectedImageUri?.toString()
             )
 
             AppData.placedMarks.create(mark)
@@ -136,7 +184,8 @@ class AddEditActivity : AppCompatActivity() {
                 title = title,
                 description = description,
                 x = x,
-                y = y
+                y = y,
+                imageUri = selectedImageUri?.toString()
             )
 
             AppData.placedMarks.update(mark)

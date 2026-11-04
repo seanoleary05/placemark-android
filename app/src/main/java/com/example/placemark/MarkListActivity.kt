@@ -6,6 +6,8 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import timber.log.Timber
+
 
 class MarkListActivity : AppCompatActivity() {
 
@@ -20,16 +22,35 @@ class MarkListActivity : AppCompatActivity() {
         recyclerView =
             findViewById(R.id.marksRecyclerView)
 
+
         adapter = PlacedMarkAdapter(
+
             marks = AppData.placedMarks.findAll(),
 
-            onEdit = { mark ->
-                editMark(mark)
-            },
+            listener = object : OnMarkListener {
 
-            onDelete = { mark ->
-                deleteMark(mark)
+
+
+                override fun onMarkClick(mark: PlacedMarkData) {
+
+                    editMark(mark)
+
+                }
+
+
+
+                override fun onMarkLongClick(mark: PlacedMarkData): Boolean {
+
+                    Timber.d("Long press on mark id=${mark.id}, title=${mark.title}")
+
+                    confirmDelete(mark)
+
+                    return true
+
+                }
+
             }
+
         )
 
         recyclerView.layoutManager =
@@ -69,7 +90,23 @@ class MarkListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun confirmDelete(mark: PlacedMarkData) {
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Delete mark?")
+            .setMessage("\"${mark.title}\" will be permanently deleted.")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteMark(mark)
+            }
+            .setNegativeButton("Cancel") { _, _ ->
+                Timber.d("Delete cancelled for mark id=${mark.id}")
+            }
+            .show()
+    }
+
     private fun deleteMark(mark: PlacedMarkData) {
+
+        Timber.i("Deleting mark id=${mark.id}, title=${mark.title}")
 
         AppData.placedMarks.delete(mark.id)
 
