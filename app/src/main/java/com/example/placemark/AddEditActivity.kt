@@ -1,5 +1,6 @@
 package com.example.placemark
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlin.jvm.java
 
 class AddEditActivity : AppCompatActivity() {
 
@@ -27,6 +29,7 @@ class AddEditActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_add_edit)
@@ -53,6 +56,10 @@ class AddEditActivity : AppCompatActivity() {
             imagePicker.launch(arrayOf("image/*"))
         }
 
+        findViewById<Button>(R.id.addButton).setOnClickListener {
+            val intent = Intent(this, MapPickerActivity::class.java)
+            mapPicker.launch(intent)
+        }
 
         imagePreview = findViewById(R.id.imageAddEdit)
 
@@ -94,6 +101,26 @@ class AddEditActivity : AppCompatActivity() {
                 imagePreview.setImageURI(uri)
             }
         }
+
+    val mapPicker =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data ?: return@registerForActivityResult
+                val selectedLatitude = data.getDoubleExtra("latitude", 0.0)
+                val selectedLongitude = data.getDoubleExtra("longitude", 0.0)
+
+                selectedLatitude?.let {
+                    xInput.setText(it.toString())
+                }
+
+                selectedLongitude?.let {
+                    yInput.setText(it.toString())
+                }
+            }
+        }
+
 
 
 

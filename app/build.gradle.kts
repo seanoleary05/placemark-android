@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.placemark"
+        applicationId = "ie.seanoleary.placemark"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -42,4 +42,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+
 }
